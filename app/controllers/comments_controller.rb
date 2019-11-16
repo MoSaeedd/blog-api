@@ -2,6 +2,7 @@ class CommentsController < ApplicationController
 
   before_action :set_post
   before_action :set_post_comment, only: [:show, :update, :destroy]
+  before_action :correct_user, only: [:edit, :update, :destroy]
 
   # GET /posts/:post_id/comments
   def index
@@ -15,8 +16,8 @@ class CommentsController < ApplicationController
 
   # POST /posts/:post_id/comments
   def create
-    @post.comments.create!(params.require(:comment).permit(:content, :user_id))
-    json_response(@post, :created)
+    @comment =current_user.comments.create!(params.permit(:content, :post_id))
+    json_response(@comment, :created)
   end
 
   # PUT /posts/:post_id/comments/:id
@@ -45,4 +46,13 @@ class CommentsController < ApplicationController
     @comment = @post.comments.find_by!(id: params[:id]) if @post
   end
 
+  def correct_user
+   # @comment = Comment.find(params[:id])  
+    unless current_user?(@comment.user)
+     render plain: 'User is not authorized to do this action'
+    end
+  end
+  def current_user?(user)
+    user == current_user
+  end
 end

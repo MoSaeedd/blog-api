@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
 
   before_action :set_post, only: [:show, :update, :destroy]
+  before_action :correct_user, only: [:edit, :update, :destroy]
 
   # GET /posts
   def index
@@ -40,6 +41,17 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:id])
+  end
+
+
+  def correct_user
+    @post = Post.find(params[:id])  
+    unless current_user?(@post.user)
+     render plain: 'User is not authorized to do this action'
+    end
+  end
+  def current_user?(user)
+    user == current_user
   end
 end
 

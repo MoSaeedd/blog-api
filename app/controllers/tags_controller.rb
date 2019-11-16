@@ -1,6 +1,7 @@
 class TagsController < ApplicationController
   before_action :set_post
   before_action :set_post_tag, only: [:show, :update, :destroy]
+  before_action :correct_user, only: [:edit, :update, :destroy]
 
   # GET /posts/:post_id/tags
   def index
@@ -45,5 +46,13 @@ class TagsController < ApplicationController
   end
 
 
-
+  def correct_user
+    @post = Post.find(params[:id])  
+    unless current_user?(@post.user)
+     render plain: 'User is not authorized to modify post tags'
+    end
+  end
+  def current_user?(user)
+    user == current_user
+  end
 end
