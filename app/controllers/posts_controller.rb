@@ -13,6 +13,8 @@ class PostsController < ApplicationController
   def create
     @post = current_user.posts.create!(post_params)
     json_response(@post, :created)
+   # PostDestroyer.perform_at(24.hours.from_now)
+    PostDestroyerWorker.perform_at(24.hours.from_now, @post.id)
   end
 
   # GET /posts/:id
